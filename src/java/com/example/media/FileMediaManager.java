@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -37,7 +38,8 @@ public class FileMediaManager implements MediaManager {
         }
         this.dir = dir;
         if(idFormat == IdFormat.WEB) {
-            hiddenLocationPrefix = dir.getParent();
+            //hiddenLocationPrefix = dir.getParent();
+            hiddenLocationPrefix = dir.toString();
         }
         logger.log(Level.INFO, "FileMediaManager created with a directory of {0}", dir);
         logger.log(Level.INFO, "FileMediaManager created with a IdFormat of {0}", idFormat);
@@ -48,7 +50,8 @@ public class FileMediaManager implements MediaManager {
         File f = new File(dir, item.getId());
         String realId = generateMediaId(f);
         item.setId(realId);
-        Files.copy(content, f.toPath());
+        //System.out.println(f.toPath().getName(f.toPath().getNameCount()-1));
+        Files.copy(content, f.toPath(), StandardCopyOption.REPLACE_EXISTING);
         //TODO Use MetaDataManager to save title, tags, and date
     }
 
@@ -128,7 +131,7 @@ public class FileMediaManager implements MediaManager {
         //when ids are relative paths they always use forwards slashes
         if (hiddenLocationPrefix != null) {
             id = id.replaceFirst(Matcher.quoteReplacement(hiddenLocationPrefix), "");
-            id = id.replaceAll(Matcher.quoteReplacement(File.separator), "/");
+            id = id.replaceAll(Matcher.quoteReplacement(File.separator), "");
         }
         return id;
     }
